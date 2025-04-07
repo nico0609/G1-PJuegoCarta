@@ -100,29 +100,58 @@ public class Jugador {
     public int calcularPuntaje() {
         int[] contadores = new int[NombreCarta.values().length];
 
-      
         for (Carta c : cartas) {
             contadores[c.getNombre().ordinal()]++;
         }
-
-        int puntaje = 0;
-
-        
+    
+     
+        boolean[][] esParteDeEscalera = new boolean[Pinta.values().length][NombreCarta.values().length];
+    
+        int[][] matrizCartas = new int[Pinta.values().length][NombreCarta.values().length];
         for (Carta c : cartas) {
-            int indice = c.getNombre().ordinal();
-
+            matrizCartas[c.getPinta().ordinal()][c.getNombre().ordinal()] = 1;
+        }
+    
+        for (int i = 0; i < Pinta.values().length; i++) {
+            int contador = 0;
+            for (int j = 0; j < NombreCarta.values().length; j++) {
+                if (matrizCartas[i][j] == 1) {
+                    contador++;
+                } else {
+                    if (contador >= 3) {
+                       
+                        for (int k = j - contador; k < j; k++) {
+                            esParteDeEscalera[i][k] = true;
+                        }
+                    }
+                    contador = 0;
+                }
+            }
             
-            if (contadores[indice] == 1) {
-               
-                if (indice == 0 || indice >= 9) { 
-                    puntaje += 10;
-                } else { 
-                    puntaje += (indice + 1); 
+            if (contador >= 3) {
+                for (int k = NombreCarta.values().length - contador; k < NombreCarta.values().length; k++) {
+                    esParteDeEscalera[i][k] = true;
                 }
             }
         }
-
+    
+       
+        int puntaje = 0;
+        for (Carta c : cartas) {
+            int nombreIdx = c.getNombre().ordinal();
+            int pintaIdx = c.getPinta().ordinal();
+    
+            
+            if (contadores[nombreIdx] == 1 && !esParteDeEscalera[pintaIdx][nombreIdx]) {
+                if (nombreIdx == 0 || nombreIdx >= 9) { 
+                    puntaje += 10;
+                } else {
+                    puntaje += (nombreIdx + 1); 
+                }
+            }
+        }
+    
         return puntaje;
     }
-
+    
 }
